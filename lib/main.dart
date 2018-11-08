@@ -1,18 +1,32 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'farmview.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  
-  List list = List();
+  final Future<Farmview> farms;
+  MyApp({Key key, this.farms}) : super(key: key);
+
+  Future<Farmview> fetchPost() async {
+    final response =
+        await http.get('https://www.friendflock.com/Farmstay/test.php?action=farms');
+    if (response.statusCode == 200) {
+      // If server returns an OK response, parse the JSON
+      return Farmview.fromJson(json.decode(response.body));
+    } else {
+      // If that response was not OK, throw an error.
+      throw Exception('Failed to load post');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
@@ -22,9 +36,6 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatelessWidget {
-
-  
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -48,7 +59,4 @@ class MyHomePage extends StatelessWidget {
           }).toList()),
     );
   }
-
 }
-
-

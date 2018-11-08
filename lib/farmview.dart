@@ -1,16 +1,14 @@
 class Farmview {
-  final int userId;
-  final int id;
-  final String title;
+  final String image;
+  final String farm;
   final String body;
 
-  Farmview({this.userId, this.id, this.title, this.body});
+  Farmview({this.image,this.farm, this.body});
 
   factory Farmview.fromJson(Map<String, dynamic> json) {
     return Farmview(
-      userId: json['userId'],
-      id: json['id'],
-      title: json['title'],
+      image:json['image'],
+      farm:json['name'],
       body: json['body'],
     );
   }
