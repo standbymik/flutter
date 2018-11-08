@@ -7,20 +7,6 @@ import 'farmview.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  final Future<Farmview> farms;
-  MyApp({Key key, this.farms}) : super(key: key);
-
-  Future<Farmview> fetchPost() async {
-    final response =
-        await http.get('https://www.friendflock.com/Farmstay/test.php?action=farms');
-    if (response.statusCode == 200) {
-      // If server returns an OK response, parse the JSON
-      return Farmview.fromJson(json.decode(response.body));
-    } else {
-      // If that response was not OK, throw an error.
-      throw Exception('Failed to load post');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,27 +22,54 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatelessWidget {
+final Future<Farmview> farms;
+  MyHomePage({Key key, this.farms}) : super(key: key);
+
+  Future<Farmview> fetchPost() async {
+    final response =
+        await http.get('https://www.friendflock.com/Farmstay/test.php?action=farms');
+    if (response.statusCode == 200) {
+      // If server returns an OK response, parse the JSON
+      return Farmview.fromJson(json.decode(response.body));
+    } else {
+      // If that response was not OK, throw an error.
+      throw Exception('Failed to load post');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: new GridView.count(
-          crossAxisCount: 2,
-          childAspectRatio: 1.0,
-          padding: const EdgeInsets.all(4.0),
-          mainAxisSpacing: 4.0,
-          crossAxisSpacing: 4.0,
-          children: <String>[
-            'https:\/\/www.friendflock.com\/Farmstay\/farmImages\/farms\/20180906102656.jpg',
-            'https:\/\/www.friendflock.com\/Farmstay\/farmImages\/farms\/20180906102656.jpg',
-            'https:\/\/www.friendflock.com\/Farmstay\/farmImages\/farms\/20180906102656.jpg',
-            'https:\/\/www.friendflock.com\/Farmstay\/farmImages\/farms\/20180906102656.jpg',
-            'https:\/\/www.friendflock.com\/Farmstay\/farmImages\/farms\/20180906102656.jpg',
-            'https:\/\/www.friendflock.com\/Farmstay\/farmImages\/farms\/20180906102656.jpg',
-            'https:\/\/www.friendflock.com\/Farmstay\/farmImages\/farms\/20180906102656.jpg',
-          ].map((String url) {
-            return new GridTile(
-                child: new Image.network(url, fit: BoxFit.cover));
-          }).toList()),
+      child: FutureBuilder<Farmview>(
+            future: farms,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Text(snapshot.data.image);
+              } else if (snapshot.hasError) {
+                return Text("${snapshot.error}");
+              }
+
+              // By default, show a loading spinner
+              return CircularProgressIndicator();
+            },
+          ),
+    );
+  }
+}
+
+
+class Farmview {
+  final String image;
+  final String farm;
+  final String body;
+
+  Farmview({this.image,this.farm, this.body});
+
+  factory Farmview.fromJson(Map<String, dynamic> json) {
+    return Farmview(
+      image:json['image'],
+      farm:json['name'],
+      body: json['body'],
     );
   }
 }
