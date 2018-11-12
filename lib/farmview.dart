@@ -4,37 +4,31 @@ import 'package:flutter/foundation.dart';
 
 import 'package:http/http.dart' as http;
 
-Future<List<Photo>> fetchPhotos(http.Client client) async {
+Future<List<Farms>> fetchFarms(http.Client client) async {
   final response =
-      await client.get('https://jsonplaceholder.typicode.com/photos');
+      await client.get('https://www.friendflock.com/Farmstay/test.php?action=farms');
 
   // Use the compute function to run parsePhotos in a separate isolate
   return compute(parsePhotos, response.body);
 }
 
 // A function that will convert a response body into a List<Photo>
-List<Photo> parsePhotos(String responseBody) {
+List<Farms> parsePhotos(String responseBody) {
   final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
 
-  return parsed.map<Photo>((json) => Photo.fromJson(json)).toList();
+  return parsed.map<Farms>((json) => Farms.fromJson(json)).toList();
 }
 
-class Photo {
-  final int albumId;
-  final int id;
+class Farms {
+  final String image;
   final String title;
-  final String url;
-  final String thumbnailUrl;
 
-  Photo({this.albumId, this.id, this.title, this.url, this.thumbnailUrl});
+  Farms({ this.image, this.title});
 
-  factory Photo.fromJson(Map<String, dynamic> json) {
-    return Photo(
-      albumId: json['albumId'] as int,
-      id: json['id'] as int,
-      title: json['title'] as String,
-      url: json['url'] as String,
-      thumbnailUrl: json['thumbnailUrl'] as String,
+  factory Farms.fromJson(Map<String, dynamic> json) {
+    return Farms(
+      image: json['image'] as String,
+      title: json['name'] as String,
     );
   }
 }
