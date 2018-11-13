@@ -28,21 +28,29 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: FutureBuilder<List<Farms>>(
-        future: fetchFarms(http.Client()),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) print(snapshot.error);
+        appBar: AppBar(
+          title: Text(title),
+        ),
+        body: Column(
+          children: <Widget>[
+            Text('Farms'),
+            _listFarms(),
+          ],
+        ));
+  }
 
-          if (snapshot.hasData) {
-            return FarmList(farms: snapshot.data);
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
+  _listFarms() {
+    return FutureBuilder<List<Farms>>(
+      future: fetchFarms(http.Client()),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) print(snapshot.error);
+
+        if (snapshot.hasData) {
+          return FarmList(farms: snapshot.data);
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
     );
   }
 }
@@ -54,20 +62,32 @@ class FarmList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(farms.length);
     return StaggeredGridView.countBuilder(
+      shrinkWrap: true,
       crossAxisCount: 4,
       itemCount: farms.length,
-      itemBuilder: (BuildContext context,int index) {
-        return Column(
-          children: <Widget>[
-            Text(farms[index].title),
-            Image.network(farms[index].image),
-          ],
+      padding: const EdgeInsets.all(4.0),
+      itemBuilder: (BuildContext context, int index) {
+        return Container(
+          margin: EdgeInsets.all(5.0),
+          child: Card(
+            child: Column(
+              children: <Widget>[
+                Text(farms[index].title),
+                Container(
+                  height:200.0,
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: NetworkImage(farms[index].image),
+                          fit: BoxFit.cover)),
+                ),
+              ],
+            ),
+          ),
         );
       },
       staggeredTileBuilder: (int index) =>
-          StaggeredTile.count(2, index.isEven ? 2 : 1),
+          StaggeredTile.count(2, index.isEven ? 2 : 2),
       mainAxisSpacing: 4.0,
       crossAxisSpacing: 4.0,
     );
