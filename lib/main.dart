@@ -28,29 +28,36 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomPadding: false,
         appBar: AppBar(
           title: Text(title),
         ),
-        body: Column(
-          children: <Widget>[
-            Text('Farms'),
-            _listFarms(),
-          ],
+        body: Container(
+          child: SingleChildScrollView(
+                      child: Column(
+              children: <Widget>[
+                Text('Farms'),
+                _listFarms(),
+              ],
+            ),
+          ),
         ));
   }
 
   _listFarms() {
-    return FutureBuilder<List<Farms>>(
-      future: fetchFarms(http.Client()),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) print(snapshot.error);
+    return Container(
+      child: FutureBuilder<List<Farms>>(
+        future: fetchFarms(http.Client()),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) print(snapshot.error);
 
-        if (snapshot.hasData) {
-          return FarmList(farms: snapshot.data);
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
+          if (snapshot.hasData) {
+            return FarmList(farms: snapshot.data);
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
     );
   }
 }
@@ -71,23 +78,30 @@ class FarmList extends StatelessWidget {
         return Container(
           margin: EdgeInsets.all(5.0),
           child: Card(
+            clipBehavior: Clip.antiAlias,
             child: Column(
               children: <Widget>[
-                Text(farms[index].title),
                 Container(
-                  height:200.0,
+                  height: 200.0,
                   decoration: BoxDecoration(
                       image: DecorationImage(
                           image: NetworkImage(farms[index].image),
                           fit: BoxFit.cover)),
                 ),
+                Card(
+                    child: Column(
+                  children: <Widget>[
+                    Text(farms[index].title),
+                    Text('รายละเอียดย่อย')
+                  ],
+                ))
               ],
             ),
           ),
         );
       },
       staggeredTileBuilder: (int index) =>
-          StaggeredTile.count(2, index.isEven ? 2 : 2),
+          StaggeredTile.count(2, index.isEven ? 3.5 : 3.5),
       mainAxisSpacing: 4.0,
       crossAxisSpacing: 4.0,
     );
